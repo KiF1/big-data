@@ -27,6 +27,19 @@ O principal objetivo deste projeto é criar um sistema escalável que possa:
 
 O projeto é estruturado de maneira a armazenar informações dos filmes e avaliações de usuários em coleções do MongoDB. A seguir, apresentamos um exemplo de como os dados são organizados:
 
+### Coleção de Usuários
+Armazena informações sobre os usuários e suas avaliações dos filmes.
+````json
+{
+  "_id": ObjectId(),
+  "user_id": "123",
+  "name": "John Doe",
+  "ratings": [
+    {"movie_id": "1", "rating": 4.5},
+    {"movie_id": "2", "rating": 5.0}
+  ]
+}
+````
 ### Coleção de Filmes
 Armazena as informações básicas sobre os filmes, como título e gênero.
 ```json
@@ -36,3 +49,10 @@ Armazena as informações básicas sobre os filmes, como título e gênero.
   "title": "The Matrix",
   "genres": ["Action", "Sci-Fi"]
 }
+````
+
+## 📊 Cálculo de Similaridade
+A similaridade entre filmes será calculada utilizando métricas como cosine similarity ou pearson correlation. Essas métricas permitirão que o sistema sugira filmes que os usuários ainda não assistiram, mas que têm alta probabilidade de gostar, com base nos gostos de usuários com preferências semelhantes.
+
+## 🎯 Geração de Recomendações
+O sistema gera recomendações com base nas avaliações dos usuários e nas similaridades entre os filmes. Utilizando técnicas de filtragem colaborativa, filmes que foram bem avaliados por usuários com gostos semelhantes são recomendados.
