@@ -5,4 +5,3 @@ O Mongo Express é uma interface web simples para gerenciar o MongoDB. Ele será
 Para iniciar o MongoDB e o Mongo Express, basta executar:
 `````bash
 docker-compose up -d
-````
