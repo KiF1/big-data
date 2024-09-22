@@ -24,10 +24,13 @@ def get_genres():
 def index():
     movie_data = None
     genres = get_genres()  # Obter os gêneros
+    error_message = None
+
     if request.method == 'POST':
         movie_name = request.form['movie_name']
         url = f'https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={movie_name}&language=pt-BR'
-        response = requests.get(url).json()
+        try:
+            response = requests.get(url).json()
         
         if response['results']:
             movie_data = response['results'][0]  # Pega o primeiro resultado
