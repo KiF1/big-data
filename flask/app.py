@@ -29,18 +29,26 @@ def index():
     if request.method == 'POST':
         movie_name = request.form['movie_name']
         url = f'https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={movie_name}&language=pt-BR'
-        try:
-            response = requests.get(url).json()
         
-        if response['results']:
-            movie_data = response['results'][0]  # Pega o primeiro resultado
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            data = response.json()
 
-    # Converte os IDs de gêneros para nomes
-    if movie_data:
-        genre_names = [genres[genre_id] for genre_id in movie_data['genre_ids'] if genre_id in genres]
-        movie_data['genre_names'] = genre_names  # Adiciona os nomes dos gêneros aos dados do filme
-    
-    return render_template('index.html', movie_data=movie_data, genres=genres)
+            if data['results']:
+                movie_data = data['results'][0]  # Pega o primeiro resultado
+
+                # Converte os IDs de gêneros para nomes
+                if movie_data:
+                    genre_names = [genres[genre_id] for genre_id in movie_data['genre_ids'] if genre_id in genres]
+                    movie_data['genre_names'] = genre_names  # Adiciona os nomes dos gêneros aos dados do filme
+            else:
+                error_message = "Filme não encontrado. Tente novamente."
+
+        except requests.exceptions.RequestException as e:
+            error_message = "Ocorreu um erro ao acessar a API. Tente novamente mais tarde."
+
+    return render_template('index.html', movie_data=movie_data, genres=genres, error_message=error_message)
 
 # ENDPOINT: Cadastrar um novo usuário
 @app.route('/usuario', methods=['POST'])
