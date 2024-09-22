@@ -21,12 +21,11 @@ def get_popular_movies():
     data = response.json()
     return data['results']  # Retorna a lista de filmes populares
 
-
 # Obter nome do gênero ao inves do ID
 def get_genres():
     url = f'https://api.themoviedb.org/3/genre/movie/list?api_key={TMDB_API_KEY}&language=pt-BR'
     response = requests.get(url).json()
-    return {genre['id']: genre['name'] for genre in response['genres']}
+    return {genre['id']: genre['name'] for genre in response['genres']} # Retorna a lista de gêneros
 
 # Index/home page
 @app.route('/', methods=['GET', 'POST'])
@@ -47,12 +46,12 @@ def index():
 
             if data['results']:
                 movie_data = data['results'][0]  # Pega o primeiro resultado
-                return redirect(url_for('detalhes_filme', filme_id=movie_data['id']))
-
+        
                 # Converte os IDs de gêneros para nomes
                 if movie_data:
                     genre_names = [genres[genre_id] for genre_id in movie_data['genre_ids'] if genre_id in genres]
                     movie_data['genre_names'] = genre_names  # Adiciona os nomes dos gêneros aos dados do filme
+                    return redirect(url_for('detalhes_filme', filme_id=movie_data['id']))
             else:
                 error_message = "Filme não encontrado. Tente novamente."
                 return render_template('index.html', movie_data=None, genres=genres, error_message=error_message, popular_movies=popular_movies, enumerate=enumerate), 404
