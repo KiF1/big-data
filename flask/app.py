@@ -1,7 +1,9 @@
 from flask import Flask, request, render_template, jsonify, session, redirect, flash, url_for
 from pymongo import MongoClient
 import requests
+import bcrypt 
 from bcrypt import hashpw, gensalt, checkpw
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 app.secret_key = '0f5152fe09bcb82401da522de768581521212121212121'
@@ -76,26 +78,39 @@ def index():
 # Rota para exibir informacoes do carousel
 @app.route('/filme/<int:filme_id>', methods=['GET'])
 def detalhes_filme(filme_id):
-    url = f'https://api.themoviedb.org/3/movie/{filme_id}?api_key={TMDB_API_KEY}&language=pt-BR'
-    response = requests.get(url)
-    data = response.json()
+    # Verifica se o filme já está no banco de dados
+    movie_details = filmes_collection.find_one({"id": filme_id})
 
-    # Verificar se o filme foi encontrado
-    if 'status_code' in data and data['status_code'] == 34:
-        return render_template('erro.html', mensagem="Filme não encontrado.")
+    if not movie_details:
+        # Se o filme não estiver no banco, faça a consulta na API
+        url = f'https://api.themoviedb.org/3/movie/{filme_id}?api_key={TMDB_API_KEY}&language=pt-BR'
+        response = requests.get(url)
+        data = response.json()
 
-    # Processar os dados para exibição
-    movie_details = {
-        'titulo': data['title'],
-        'resumo': data['overview'],
-        'data_lancamento': data['release_date'],
-        'generos': [genre['name'] for genre in data['genres']],
-        'duracao': data['runtime'],
-        'nota_media': data['vote_average'],
-        'poster': data['poster_path'],
-    }
+        # Verificar se o filme foi encontrado
+        if 'status_code' in data and data['status_code'] == 34:
+            return render_template('erro.html', mensagem="Filme não encontrado.")
+
+        # Processar os dados para exibição
+        movie_details = {
+            'id': data['id'],  # Adiciona o ID do filme para identificação
+            'titulo': data['title'],
+            'resumo': data['overview'],
+            'data_lancamento': data['release_date'],
+            'generos': [genre['name'] for genre in data['genres']],
+            'duracao': data['runtime'],
+            'nota_media': data['vote_average'],
+            'poster': data['poster_path'],
+        }
+
+        # Salvar os detalhes do filme no banco de dados
+        filmes_collection.insert_one(movie_details)
+    else:
+        # Se o filme já está no banco, converte o ObjectId para um dicionário padrão
+        movie_details = {k: movie_details[k] for k in movie_details if k != '_id'}
 
     return render_template('detalhes.html', movie=movie_details)
+
 
 # Rota de Login
 @app.route('/login', methods=['GET', 'POST'])

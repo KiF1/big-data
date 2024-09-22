@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Filmes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Lista de Filmes</h1>
+        <p>Total de filmes no banco de dados: {{ total_filmes }}</p>
+
+        <ul>
+            {% for filme in filmes %}
+            <li>{{ filme['titulo'] }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="container mt-5">
+        <h1 class="text-center">Lista de Filmes</h1>
+        <div class="row">
+            {% for filme in filmes %}
+                <div class="col-md-3 mb-4">
+                    <div class="card">
+                        <img src="https://image.tmdb.org/t/p/w500{{ filme.poster }}" class="card-img-top" alt="{{ filme.titulo }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ filme.titulo }}</h5>
+                            <p class="card-text">Resumo: {{ filme.resumo }}</p>
+                            <p><strong>Data de Lançamento:</strong> {{ filme.data_lancamento }}</p>
+                            <p><strong>Duração:</strong> {{ filme.duracao }} minutos</p>
+                            <p><strong>Nota Média:</strong> {{ filme.nota_media }}</p>
+                            <a href="/moviesdb/{{ filme.id }}" class="btn btn-primary">Ver Detalhes</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

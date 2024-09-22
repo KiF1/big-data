@@ -24,22 +24,46 @@
                 <p><strong>Sinopse:</strong> {{ movie['resumo'] }}</p>
             </div>
         </div>
-        <a href="/" class="btn btn-primary mt-3">Voltar</a>
-    </div>
-    
-    {% for avaliacao in usuario.avaliacoes %}
-    {% if avaliacao.filme_id == movie_data.id %}
-        <p><strong>Sua Avaliação:</strong> {{ avaliacao.nota }}</p>
-    {% endif %}
-    {% endfor %}
+        
+        {% if 'usuario_id' in session %}
+        <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#modalAvaliar">
+            Avaliar
+        </button>        
+        {% endif %}
+        <a href="/" class="btn btn-primary mt-3">Voltar ao inicio</a>  
 
-    <form method="POST" action="/avaliar/{{ movie_data.id }}">
-        <div class="form-group">
-            <label for="nota">Avaliação (0 a 10):</label>
-            <input type="number" name="nota" class="form-control" min="0" max="10" required>
+        <!-- Modal para Avaliação -->
+        <div class="modal fade" id="modalAvaliar" tabindex="-1" role="dialog" aria-labelledby="modalAvaliarLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalAvaliarLabel">Avaliar Filme</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ url_for('avaliar_filme', filme_id=movie.id) }}" method="POST">
+                        <div class="modal-body">
+                            <input type="hidden" name="filme_id" value="{{ movie.id }}">
+                            <div class="form-group">
+                                <label for="nota">Nota (0 a 10)</label>
+                                <input type="number" name="nota" class="form-control" min="0" max="10" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                            <button type="submit" class="btn btn-primary">Enviar Avaliação</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">Enviar Avaliação</button>
-    </form>
-    
+
+
+
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
