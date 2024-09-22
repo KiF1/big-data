@@ -3,17 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Busca de Filmes</title>
+    <title>Sistema de Busca de Filmes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #f2f2f2;
         }
         .container {
-            max-width: 600px;
+            max-width: 1200px;
         }
-        h1 {
-            font-weight: bold;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #0e078e; 
+            color: white;
+            padding: 15px 20px;
+        }
+        .header h1 {
+            margin: 0;
         }
         .form-group input {
             height: 50px;
@@ -23,7 +31,7 @@
             font-weight: 600;
         }
         .card-header {
-            background-color: #2b15c6;
+            background-color: #2b15c6; 
             color: white;
             font-size: 24px;
             text-align: center;
@@ -38,6 +46,7 @@
             width: 150px;
             border-radius: 10px;
             margin-bottom: 20px;
+            margin-right: 20px;
         }
         .card-body .details {
             flex: 1;
@@ -56,13 +65,15 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="text-center">Busca de Filmes</h1>
-        <form method="POST" class="mt-4">
-            <div class="form-group">
-                <input type="text" name="movie_name" class="form-control" placeholder="Digite o nome do filme" required>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Buscar</button>
-        </form>
+        <div class="header">
+            <h1>Sistema de Busca de Filmes</h1>
+            <form method="POST" class="form-inline">
+                <div class="form-group mb-2">
+                    <input type="text" name="movie_name" class="form-control" placeholder="Pesquisar um filme" required>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2 ml-2">Pesquisar</button>
+            </form>
+        </div>
 
         {% if error_message %}
         <div class="alert alert-danger mt-3">{{ error_message }}</div>
