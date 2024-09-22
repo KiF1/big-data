@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Busca de Filmes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+        }
+        h1 {
+            font-weight: bold;
+        }
+        .form-group input {
+            height: 50px;
+        }
+        .btn {
+            font-size: 18px;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
@@ -27,14 +45,12 @@
                 </div>
                 <div class="card-body">
                     <p><strong>ID do Filme:</strong> {{ movie_data.id }}</p>
-                    <img src="https://image.tmdb.org/t/p/w500{{ movie_data.poster_path }}" alt="Capa do Filme" class="img-thumbnail w-25 mt-3">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie_data.poster_path }}" alt="Capa do Filme" class="img-thumbnail w-50 mt-3">
                     <p><strong>Resumo:</strong> {{ movie_data.overview }}</p>
                     <p><strong>Data de Lançamento:</strong> {{ movie_data.release_date }}</p>
-            <p><strong>Gêneros:</strong> 
-                {% if movie_data %}
-                    {{ movie_data.genre_names | join(", ") }}
-                {% endif %}
-            </p>                       
+                    <p><strong>Gêneros:</strong> 
+                        {{ movie_data.genre_names | join(", ") }}
+                    </p>                       
                     <p><strong>Nota Média:</strong> {{ movie_data.vote_average }}</p>
                 </div>
             </div>
