@@ -3,18 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Busca de Filmes</title>
+    <title>Sistema de Busca de Filmes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f2f2f2;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #0e078e; 
+            color: white;
+            padding: 15px 20px;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .form-group input {
+            height: 50px;
+        }
+        .btn {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .card-header {
+            background-color: #2b15c6; 
+            color: white;
+            font-size: 24px;
+            text-align: center;
+        }
+        .card-body {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        .card-body img {
+            width: 150px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            margin-right: 20px;
+        }
+        .card-body .details {
+            flex: 1;
+            text-align: left;
+        }
+        @media (max-width: 576px) {
+            .card-body {
+                flex-direction: column;
+                text-align: center;
+            }
+            .card-body .details {
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="text-center">Busca de Filmes</h1>
-        <form method="POST" class="mt-4">
-            <div class="form-group">
-                <input type="text" name="movie_name" class="form-control" placeholder="Digite o nome do filme" required>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Buscar</button>
-        </form>
+        <div class="header">
+            <h1>Sistema de Busca de Filmes</h1>
+            <form method="POST" class="form-inline">
+                <div class="form-group mb-2">
+                    <input type="text" name="movie_name" class="form-control" placeholder="Pesquisar um filme" required>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2 ml-2">Pesquisar</button>
+            </form>
+        </div>
 
         {% if error_message %}
         <div class="alert alert-danger mt-3">{{ error_message }}</div>
@@ -58,19 +117,17 @@
         {% if movie_data %}
             <div class="card mt-5">
                 <div class="card-header">
-                    <h2>{{ movie_data.title }}</h2>
+                    {{ movie_data.title }}
                 </div>
                 <div class="card-body">
-                    <p><strong>ID do Filme:</strong> {{ movie_data.id }}</p>
-                    <img src="https://image.tmdb.org/t/p/w500{{ movie_data.poster_path }}" alt="Capa do Filme" class="img-thumbnail w-25 mt-3">
-                    <p><strong>Resumo:</strong> {{ movie_data.overview }}</p>
-                    <p><strong>Data de Lançamento:</strong> {{ movie_data.release_date }}</p>
-            <p><strong>Gêneros:</strong> 
-                {% if movie_data %}
-                    {{ movie_data.genre_names | join(", ") }}
-                {% endif %}
-            </p>                       
-                    <p><strong>Nota Média:</strong> {{ movie_data.vote_average }}</p>
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie_data.poster_path }}" alt="Capa do Filme">
+                    <div class="details">
+                        <p><strong>ID do Filme:</strong> {{ movie_data.id }}</p>
+                        <p><strong>Resumo:</strong> {{ movie_data.overview }}</p>
+                        <p><strong>Data de Lançamento:</strong> {{ movie_data.release_date }}</p>
+                        <p><strong>Gêneros:</strong> {{ movie_data.genre_names | join(", ") }}</p>                       
+                        <p><strong>Nota Média:</strong> {{ movie_data.vote_average }}</p>
+                    </div>
                 </div>
             </div>
         {% endif %}
