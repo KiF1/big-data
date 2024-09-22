@@ -22,6 +22,22 @@
             </div>
         </div>
         <a href="/" class="btn btn-primary mt-3">Voltar</a>
+
     </div>
+    
+    {% for avaliacao in usuario.avaliacoes %}
+    {% if avaliacao.filme_id == movie_data.id %}
+        <p><strong>Sua Avaliação:</strong> {{ avaliacao.nota }}</p>
+    {% endif %}
+    {% endfor %}
+
+    <form method="POST" action="/avaliar/{{ movie_data.id }}">
+        <div class="form-group">
+            <label for="nota">Avaliação (0 a 10):</label>
+            <input type="number" name="nota" class="form-control" min="0" max="10" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar Avaliação</button>
+    </form>
+    
 </body>
 </html>

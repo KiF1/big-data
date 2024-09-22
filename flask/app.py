@@ -1,19 +1,28 @@
-from flask import Flask, request, render_template, jsonify, redirect, url_for, flash
+from flask import Flask, request, render_template, jsonify, session, redirect, flash, url_for
 from pymongo import MongoClient
 import requests
-import bcrypt
+from bcrypt import hashpw, gensalt, checkpw
 
 app = Flask(__name__)
 app.secret_key = '0f5152fe09bcb82401da522de768581521212121212121'
 
 # Conectar ao MongoDB
-client = MongoClient('mongodb://localhost:27017/')
+client = MongoClient('mongodb://root:example@localhost:27017/')
 db = client['filmes_db']
 usuarios_collection = db['usuarios']
 filmes_collection = db['filmes']
 
 # Chave da API TMDb
 TMDB_API_KEY = '0f5152fe09bcb82401da522de7685815'
+
+# Rota Dashboard e redirecionar caso não esteja logado
+@app.route('/dashboard')
+def dashboard():
+    if 'usuario_id' not in session:
+        return redirect('/login')  # Redireciona para a página de login se não estiver autenticado
+    usuario_id = session['usuario_id']
+    return render_template('dashboard.html', usuario_id=usuario_id)
+
 
 # Obter Lista de filmes em alta
 def get_popular_movies():
@@ -95,14 +104,21 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        user = usuarios_collection.find_one({"username": username})
-        if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
-            # Login bem-sucedido
-            return redirect(url_for('index'))
+        usuario = usuarios_collection.find_one({"username": username})
+
+        if usuario and checkpw(password.encode('utf-8'), usuario['password']):
+            session['usuario_id'] = str(usuario['_id'])
+            return redirect('/')
         else:
-            flash("Nome de usuário ou senha incorretos.")
-    
+            flash('Nome de usuário ou senha inválidos', 'danger')
+
     return render_template('login.html')
+
+# Rota de Logout
+@app.route('/logout')
+def logout():
+    session.pop('usuario_id', None)  # Remove o ID do usuário da sessão
+    return redirect('/')
 
 # Rota de Registro
 @app.route('/register', methods=['GET', 'POST'])
@@ -124,6 +140,24 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html')
+
+# Avaliar filme
+@app.route('/avaliar/<filme_id>', methods=['POST'])
+def avaliar_filme(filme_id):
+    if 'usuario_id' not in session:
+        return redirect('/login')  # Redireciona se o usuário não estiver logado
+    
+    usuario_id = session['usuario_id']
+    nota = request.form['nota']
+    
+    # Salvar a avaliação no banco de dados
+    usuarios_collection.update_one(
+        {"_id": usuario_id},
+        {"$push": {"avaliacoes": {"filme_id": filme_id, "nota": nota}}}
+    )
+    
+    return redirect(f'/filme/{filme_id}')  # Redireciona de volta para a página de detalhes do filme
+
 
 if __name__ == '__main__':
     app.run(debug=True)
