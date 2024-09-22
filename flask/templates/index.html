@@ -5,63 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Busca de Filmes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #f2f2f2;
-        }
-        .container {
-            max-width: 1200px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #0e078e; 
-            color: white;
-            padding: 15px 20px;
-        }
-        .header h1 {
-            margin: 0;
-        }
-        .form-group input {
-            height: 50px;
-        }
-        .btn {
-            font-size: 18px;
-            font-weight: 600;
-        }
-        .card-header {
-            background-color: #2b15c6; 
-            color: white;
-            font-size: 24px;
-            text-align: center;
-        }
-        .card-body {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-        }
-        .card-body img {
-            width: 150px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            margin-right: 20px;
-        }
-        .card-body .details {
-            flex: 1;
-            text-align: left;
-        }
-        @media (max-width: 576px) {
-            .card-body {
-                flex-direction: column;
-                text-align: center;
-            }
-            .card-body .details {
-                text-align: center;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../static/style.css"> 
 </head>
 <body>
     <div class="container mt-5">
@@ -79,8 +23,8 @@
         <div class="alert alert-danger mt-3">{{ error_message }}</div>
         {% endif %}
 
+        <h2>Filmes em alta</h2>
         <div id="carouselExample" class="carousel slide" data-ride="carousel">
-            <h2>Filmes em alta</h2>
             <div class="carousel-inner">
               {% for i in range(0, popular_movies|length, 4) %}
               <div class="carousel-item {% if i == 0 %}active{% endif %}">
@@ -89,7 +33,7 @@
                   <div class="col-md-3">
                     <a href="/filme/{{ movie['id'] }}" style="text-decoration: none;">
                       <div class="card">
-                        <img src="https://image.tmdb.org/t/p/w500{{ movie['poster_path'] }}" class="card-img-top img-fluid" alt="{{ movie['title'] }}" style="height: 300px;">
+                        <img src="https://image.tmdb.org/t/p/w500{{ movie['poster_path'] }}" class="card-img-top img-fluid" alt="{{ movie['title'] }}">
                         <div class="card-body">
                           <h5 class="card-title">{{ movie['title'] }}</h5>
                         </div>
@@ -111,6 +55,12 @@
               <span class="carousel-control-next-icon" aria-hidden="true"></span>
               <span class="sr-only">Next</span>
             </a>
+            
+            <ol class="carousel-indicators">
+              {% for i in range(0, popular_movies|length // 4) %}
+              <li data-target="#carouselExample" data-slide-to="{{ i }}" class="{% if i == 0 %}active{% endif %}"></li>
+              {% endfor %}
+            </ol>
           </div>
           
 

@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ movie['titulo'] }}</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/detalhes.css"> 
 </head>
 <body>
     <div class="container mt-4">
-        <h1>{{ movie['titulo'] }}</h1>
+        <div class="header">
+            <h1>{{ movie['titulo'] }}</h1>
+        </div>
         <div class="row">
             <div class="col-md-4">
-                <img src="https://image.tmdb.org/t/p/w500{{ movie['poster'] }}" class="img-fluid" alt="{{ movie['titulo'] }}">
+                <img src="https://image.tmdb.org/t/p/w500{{ movie['poster'] }}" class="img-fluid movie-poster" alt="{{ movie['titulo'] }}">
             </div>
-            <div class="col-md-8">
+            <div class="col-md-8 movie-details">
                 <p><strong>Data de Lançamento:</strong> {{ movie['data_lancamento'] }}</p>
                 <p><strong>Gêneros:</strong> {{ movie['generos'] | join(', ') }}</p>
                 <p><strong>Duração:</strong> {{ movie['duracao'] }} minutos</p>
@@ -21,7 +24,7 @@
                 <p><strong>Sinopse:</strong> {{ movie['resumo'] }}</p>
             </div>
         </div>
-        <a href="/" class="btn btn-primary mt-3">Voltar</a>
+        <a href="/" class="btn mt-3">Voltar</a>
     </div>
 </body>
 </html>
