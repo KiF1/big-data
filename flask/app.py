@@ -1,8 +1,10 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, jsonify, redirect, url_for, flash
 from pymongo import MongoClient
 import requests
+import bcrypt
 
 app = Flask(__name__)
+app.secret_key = '0f5152fe09bcb82401da522de768581521212121212121'
 
 # Conectar ao MongoDB
 client = MongoClient('mongodb://localhost:27017/')
@@ -27,7 +29,7 @@ def get_genres():
     response = requests.get(url).json()
     return {genre['id']: genre['name'] for genre in response['genres']} # Retorna a lista de gêneros
 
-# Index/home page
+# Rota Index/home page
 @app.route('/', methods=['GET', 'POST'])
 def index():
     movie_data = None
@@ -85,6 +87,43 @@ def detalhes_filme(filme_id):
     }
 
     return render_template('detalhes.html', movie=movie_details)
+
+# Rota de Login
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        user = usuarios_collection.find_one({"username": username})
+        if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
+            # Login bem-sucedido
+            return redirect(url_for('index'))
+        else:
+            flash("Nome de usuário ou senha incorretos.")
+    
+    return render_template('login.html')
+
+# Rota de Registro
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if len(password) < 6:
+            flash("A senha deve ter pelo menos 6 caracteres.")
+            return redirect(url_for('register'))
+
+        if usuarios_collection.find_one({"username": username}):
+            flash("Nome de usuário já existe.")
+            return redirect(url_for('register'))
+
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        usuarios_collection.insert_one({"username": username, "password": hashed_password})
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
