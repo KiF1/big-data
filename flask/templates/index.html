@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca de Filmes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Busca de Filmes</h1>
+        <form method="POST" class="mt-4">
+            <div class="form-group">
+                <input type="text" name="movie_name" class="form-control" placeholder="Digite o nome do filme" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        {% if movie_data %}
+            <h2 class="mt-5">{{ movie_data.title }}</h2>
+            <p><strong>ID do Filme:</strong> {{ movie_data.id }}</p>
+            <p><strong>Resumo:</strong> {{ movie_data.overview }}</p>
+            <p><strong>Data de Lançamento:</strong> {{ movie_data.release_date }}</p>
+            <p><strong>Gêneros:</strong> 
+                {% if movie_data %}
+                    {{ movie_data.genre_names | join(", ") }}
+                {% endif %}
+            </p>                       
+            <p><strong>Nota Média:</strong> {{ movie_data.vote_average }}</p>
+            <img src="https://image.tmdb.org/t/p/w500{{ movie_data.poster_path }}" alt="Capa do Filme" class="img-fluid mt-3">
+        {% endif %}
+    </div>
+</body>
+</html>
