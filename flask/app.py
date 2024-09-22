@@ -32,7 +32,7 @@ def index():
         
         try:
             response = requests.get(url)
-            response.raise_for_status()
+            response.raise_for_status()  # Levanta exceção se houver erro HTTP
             data = response.json()
 
             if data['results']:
@@ -44,11 +44,14 @@ def index():
                     movie_data['genre_names'] = genre_names  # Adiciona os nomes dos gêneros aos dados do filme
             else:
                 error_message = "Filme não encontrado. Tente novamente."
+                return render_template('index.html', movie_data=None, genres=genres, error_message=error_message), 404
 
         except requests.exceptions.RequestException as e:
-            error_message = "Ocorreu um erro ao acessar a API. Tente novamente mais tarde."
+            error_message = f"Ocorreu um erro ao acessar a API: {str(e)}. Tente novamente mais tarde."
+            return render_template('index.html', movie_data=None, genres=genres, error_message=error_message), 500
 
     return render_template('index.html', movie_data=movie_data, genres=genres, error_message=error_message)
+
 
 # ENDPOINT: Cadastrar um novo usuário
 @app.route('/usuario', methods=['POST'])
