@@ -30,16 +30,27 @@
         }
         .card-body {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
         }
         .card-body img {
             width: 150px;
             border-radius: 10px;
+            margin-bottom: 20px;
         }
         .card-body .details {
-            margin-left: 20px;
             flex: 1;
+            text-align: left;
+        }
+        @media (max-width: 576px) {
+            .card-body {
+                flex-direction: column;
+                text-align: center;
+            }
+            .card-body .details {
+                text-align: center;
+            }
         }
     </style>
 </head>
