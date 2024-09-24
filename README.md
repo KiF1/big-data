@@ -1,4 +1,4 @@
-# 🎬 Sistema de Recomendação de Filmes
+# 🎬 Cine Nassau
 
 Este projeto desenvolve um **Sistema de Recomendação de Filmes** que utiliza as avaliações dos usuários para sugerir filmes com base em suas preferências. O projeto foi construído utilizando **MongoDB** como banco de dados NoSQL e **Python** para processamento e análise dos dados, aproveitando bibliotecas populares para a criação de sistemas de recomendação.
 
@@ -15,44 +15,37 @@ O principal objetivo deste projeto é criar um sistema escalável que possa:
 - **Motivo da Escolha**: MongoDB foi escolhido por sua flexibilidade na modelagem de dados, sendo ideal para lidar com dados semi-estruturados, como avaliações de filmes e informações de usuários. MongoDB também oferece suporte para consultas complexas e agregações, essenciais para calcular a similaridade entre filmes e usuários.
 
 ### 2. **Python**
-- **Motivo da Escolha**: Python foi escolhido por sua simplicidade e vasta gama de bibliotecas para ciência de dados. Além disso, bibliotecas como `pymongo` facilitam a integração com MongoDB, enquanto `pandas` e `scikit-learn` são ferramentas poderosas para processamento de dados e cálculos de similaridade.
+- **Motivo da Escolha**: Python foi escolhido por sua simplicidade e vasta gama de bibliotecas para ciência de dados. Além disso, bibliotecas como `pymongo` facilitam a integração com MongoDB, enquanto `pandas` é uma ferramenta poderosa para processamento de dados.
 
-### 3. **Flask (Opcional)**
-- **Motivo da Escolha**: Flask pode ser utilizado para criar uma API simples para fornecer as recomendações em tempo real. Ele permite uma integração rápida e eficiente com o MongoDB e outras bibliotecas de Python, caso seja necessário expor as funcionalidades do sistema para uma aplicação web.
-
-### 4. **Pandas e NumPy**
-- **Motivo da Escolha**: Essas bibliotecas serão usadas para manipulação e análise dos dados. `Pandas` oferece uma interface eficiente para transformar e filtrar grandes volumes de dados, enquanto `NumPy` facilita operações matemáticas e cálculos de similaridade.
+### 3. **Flask**
+- **Motivo da Escolha**: Flask foi utilizado para criar uma API simples para fornecer as recomendações em tempo real. Ele permite uma integração rápida e eficiente com o MongoDB e outras bibliotecas de Python, caso seja necessário expor as funcionalidades do sistema para uma aplicação web.
 
 ## 📂 Estrutura do Projeto
 
-O projeto é estruturado de maneira a armazenar informações dos filmes e avaliações de usuários em coleções do MongoDB. A seguir, apresentamos um exemplo de como os dados são organizados:
+O projeto é estruturado de maneira simples para facilitar o trabalho. A seguir, apresentamos um exemplo de como os arquivos são organizados:
 
-### Coleção de Usuários
+### Estrutura de arquivos
 Armazena informações sobre os usuários e suas avaliações dos filmes.
-````json
-{
-  "_id": ObjectId(),
-  "user_id": "123",
-  "name": "John Doe",
-  "ratings": [
-    {"movie_id": "1", "rating": 4.5},
-    {"movie_id": "2", "rating": 5.0}
-  ]
-}
-````
-### Coleção de Filmes
-Armazena as informações básicas sobre os filmes, como título e gênero.
-```json
-{
-  "_id": ObjectId(),
-  "movie_id": "1",
-  "title": "The Matrix",
-  "genres": ["Action", "Sci-Fi"]
-}
+````shell
+cinenassau/
+│
+├── app.py                  # Arquivo principal da aplicação Flask
+├── static/                 # Arquivos estáticos (CSS, JS, imagens)
+├── templates/              # Diretório de templates HTML
+│   ├── index.html          # Página inicial
+│   ├── login.html          # Página de login
+│   ├── register.html       # Página de registro
+│   ├── detalhes.html       # Página de detalhes do filme
+│   ├── dashboard.html      # Página de dashboard do usuário
+│    
+├── docker/
+│   ├── docker-compose.yml  # Documentação do projeto 
+│   ├── README.md           # Documentação do projeto
+│
+├── requirements.txt        # Dependências do projeto
+└── README.md               # Documentação do projeto
 ````
 
 ## 📊 Cálculo de Similaridade
-A similaridade entre filmes será calculada utilizando métricas como cosine similarity ou pearson correlation. Essas métricas permitirão que o sistema sugira filmes que os usuários ainda não assistiram, mas que têm alta probabilidade de gostar, com base nos gostos de usuários com preferências semelhantes.
 
 ## 🎯 Geração de Recomendações
-O sistema gera recomendações com base nas avaliações dos usuários e nas similaridades entre os filmes. Utilizando técnicas de filtragem colaborativa, filmes que foram bem avaliados por usuários com gostos semelhantes são recomendados.
