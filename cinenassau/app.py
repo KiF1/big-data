@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, jsonify, session, redirect, f
 from pymongo import MongoClient
 import bson
 import requests
+import os
 from argon2 import PasswordHasher
 from bson.objectid import ObjectId
 from bson import ObjectId, errors
@@ -9,16 +10,17 @@ from bson import ObjectId, errors
 
 app = Flask(__name__)
 argon = PasswordHasher()
-app.secret_key = '0f5152fe09bcb82401da522de768581521212121212121'
+app.secret_key = os.getenv('APP_SECRET_KEY')
 
 # Conectar ao MongoDB
-client = MongoClient('mongodb://root:example@localhost:27017/')
+mongo_client_secret = os.getenv('MONGO_CLIENT_SECRET_KEY')
+client = MongoClient(mongo_client_secret)
 db = client['filmes_db']
 usuarios_collection = db['usuarios']
 filmes_collection = db['filmes']
 
 # Chave da API TMDb
-TMDB_API_KEY = '0f5152fe09bcb82401da522de7685815'
+TMDB_API_KEY = os.getenv('TMDB_API_SECRET_KEY')
 
 from flask import jsonify
 
