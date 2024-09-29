@@ -6,7 +6,6 @@ from argon2 import PasswordHasher
 from bson.objectid import ObjectId
 from bson import ObjectId, errors
 
-
 app = Flask(__name__)
 argon = PasswordHasher()
 app.secret_key = '0f5152fe09bcb82401da522de768581521212121212121'
@@ -19,27 +18,6 @@ filmes_collection = db['filmes']
 
 # Chave da API TMDb
 TMDB_API_KEY = '0f5152fe09bcb82401da522de7685815'
-
-from flask import jsonify
-
-@app.route('/minhas_avaliacoes_json')
-def minhas_avaliacoes_json():
-    if 'usuario_id' not in session:
-        return jsonify({"error": "Usuário não autenticado"}), 401
-
-    usuario_id = session['usuario_id']
-    usuario = usuarios_collection.find_one({"_id": ObjectId(usuario_id)})
-
-    if usuario is None:
-        return jsonify({"error": "Usuário não encontrado"}), 404
-
-    # Buscar as avaliações do usuário
-    avaliacoes = usuario.get('avaliacoes', [])
-
-    # Retornar as avaliações em formato JSON
-    return jsonify(avaliacoes)
-
-
 
 # Rota Dashboard
 @app.route('/dashboard')
@@ -275,36 +253,6 @@ def avaliar_filme(filme_id):
     )
     
     return redirect(f'/filme/{filme_id}')  # Redireciona de volta para a página de detalhes do filme
-
-
-#TESTE MOVIESDB /moviesdb para exibir os filmes no BD
-@app.route('/moviesdb')
-def moviesdb():
-    # Buscar todos os filmes do banco de dados
-    filmes = list(filmes_collection.find({}))
-
-    # Converter ObjectId para string para evitar problemas no template
-    for filme in filmes:
-        filme['_id'] = str(filme['_id'])
-
-    return render_template('moviesdb.html', filmes=filmes)
-
-
-#TESTE /filmes para exibir o json
-@app.route('/filmes', methods=['GET'])
-def listar_filmes():
-    # Buscar todos os filmes no banco de dados
-    filmes = filmes_collection.find()  # Isso traz todos os documentos da coleção
-
-    # Converter o cursor em uma lista
-    filmes_lista = []
-    for filme in filmes:
-        # Convertemos o ObjectId para string para que ele seja serializável
-        filme['_id'] = str(filme['_id'])
-        filmes_lista.append(filme)
-
-    return jsonify(filmes_lista)  # Retorna a lista de filmes como JSON
-
 
 if __name__ == '__main__':
     app.run(debug=True)
