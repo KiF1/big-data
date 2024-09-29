@@ -2,13 +2,13 @@ from flask import Flask, request, render_template, jsonify, session, redirect, f
 from pymongo import MongoClient
 import bson
 import requests
-import bcrypt 
-from bcrypt import hashpw, gensalt, checkpw
+from argon2 import PasswordHasher
 from bson.objectid import ObjectId
 from bson import ObjectId, errors
 
 
 app = Flask(__name__)
+argon = PasswordHasher()
 app.secret_key = '0f5152fe09bcb82401da522de768581521212121212121'
 
 # Conectar ao MongoDB
@@ -56,9 +56,31 @@ def dashboard():
     # Buscar as avaliações do usuário
     avaliacoes = usuario.get('avaliacoes', [])
     quantidade_filmes_avaliados = len(avaliacoes)
+    GENRES_MAP = {
+        "Ação": 28,
+        "Aventura": 12,
+        "Animação": 16,
+        "Comédia": 35,
+        "Crime": 80,
+        "Documentário": 99,
+        "Drama": 18,
+        "Família": 10751,
+        "Fantasia": 14,
+        "História": 36,
+        "Terror": 27,
+        "Música": 10402,
+        "Mistério": 9648,
+        "Romance": 10749,
+        "Ficção Científica": 878,
+        "Filme para TV": 10770,
+        "Suspense": 53,
+        "Guerra": 10752,
+        "Faroeste": 37,
+    }
 
     # Buscar detalhes dos filmes avaliados
     filmes_avaliados = []
+    generos_recomendados = set()
     for avaliacao in avaliacoes:
         filme_id = avaliacao['filme_id']
         try:
@@ -66,11 +88,45 @@ def dashboard():
             if filme:
                 filme['nota'] = avaliacao['nota']  # Adiciona a nota ao filme
                 filmes_avaliados.append(filme)
+                generos_recomendados.update(filme['generos'])
         except Exception as e:
             print(f"Erro ao buscar filme com ID {filme_id}: {e}")
             continue  # Ignorar erros de busca
 
-    return render_template('dashboard.html', usuario=usuario, quantidade_filmes_avaliados=quantidade_filmes_avaliados, filmes_avaliados=filmes_avaliados)
+    # Mapeia os gêneros para os IDs correspondentes
+    ids_recomendados = [GENRES_MAP[genero] for genero in generos_recomendados if genero in GENRES_MAP]
+
+    # Buscar filmes recomendados com base nos gêneros avaliados
+    filmes_recomendados = []
+    for id_recomendado in ids_recomendados:
+        filmes_recomendados.extend(get_filmes_por_genero(id_recomendado))
+
+    # Remover duplicatas, mantendo os filmes únicos
+    filmes_recomendados_unicos = []
+    ids_recomendados = set()  # Conjunto para rastrear IDs únicos
+
+    for filme in filmes_recomendados:
+        if filme['id'] not in ids_recomendados:
+            ids_recomendados.add(filme['id'])  # Adiciona o ID ao conjunto
+            filmes_recomendados_unicos.append(filme)  # Adiciona o filme à nova lista
+    
+    filmes_recomendados = filmes_recomendados_unicos
+
+    # Excluir filmes já avaliados da lista de recomendados
+    filmes_recomendados = [filme for filme in filmes_recomendados if filme['id'] not in [f['id'] for f in filmes_avaliados]]
+
+
+    return render_template('dashboard.html', usuario=usuario, quantidade_filmes_avaliados=quantidade_filmes_avaliados, filmes_avaliados=filmes_avaliados, filmes_recomendados=filmes_recomendados)
+
+
+def get_filmes_por_genero(genero_id):
+    url = f'https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres={genero_id}&language=pt-BR'
+    response = requests.get(url)
+    response.raise_for_status()
+    data = response.json()
+
+    # Retornar apenas os primeiros 4 resultados
+    return data['results'][:10]
 
 # Obter Lista de filmes em alta
 def get_popular_movies():
@@ -168,7 +224,7 @@ def login():
 
         usuario = usuarios_collection.find_one({"username": username})
 
-        if usuario and checkpw(password.encode('utf-8'), usuario['password']):
+        if usuario and argon.verify(usuario['password'], password):
             session['usuario_id'] = str(usuario['_id'])
             return redirect('/')
         else:
@@ -197,7 +253,7 @@ def register():
             flash("Nome de usuário já existe.")
             return redirect(url_for('register'))
 
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        hashed_password = argon.hash(password.encode('utf-8'))
         usuarios_collection.insert_one({"username": username, "password": hashed_password})
         return redirect(url_for('login'))
 
@@ -219,6 +275,7 @@ def avaliar_filme(filme_id):
     )
     
     return redirect(f'/filme/{filme_id}')  # Redireciona de volta para a página de detalhes do filme
+
 
 #TESTE MOVIESDB /moviesdb para exibir os filmes no BD
 @app.route('/moviesdb')
