@@ -8,7 +8,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #0a1c30; 
+    background-color: #0a1c30;
     color: white;
     padding: 15px 20px;
 }
@@ -23,7 +23,7 @@ body {
     font-weight: 600;
 }
 .card-header {
-    background-color: #2b15c6; 
+    background-color: #2b15c6;
     color: white;
     font-size: 24px;
     text-align: center;
@@ -36,11 +36,11 @@ body {
 }
 .card {
     height: 520px;
-    width: 270px; 
-    margin: 10px; 
+    width: 270px;
+    margin: 10px;
 }
 .card-body img {
-    height: 250px; 
+    height: 250px;
     border-radius: 10px;
     object-fit: cover;
 }
@@ -49,7 +49,7 @@ body {
     text-align: left;
 }
 .carousel-item {
-    padding: 20px 0; 
+    padding: 20px 0;
 }
 .carousel-control-prev,
 .carousel-control-next {
@@ -57,19 +57,41 @@ body {
 }
 h2 {
     margin-top: 30px;
-    margin-bottom: 10px; 
+    margin-bottom: 10px;
 }
 .carousel-indicators {
-    bottom: -30px; 
+    bottom: -30px;
 }
 .carousel-indicators li {
     background-color: #0a1c30;
-    border-radius: 50%; 
-    width: 12px; 
-    height: 12px; 
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
 }
+.carousel-controls {
+    position: absolute; /* Mantém os botões fora do carousel */
+    top: 50%; /* Centraliza verticalmente */
+    width: 100%; /* Ocupa toda a largura do carousel */
+    display: flex;
+    justify-content: space-between; /* Alinha os botões nas extremidades */
+    transform: translateY(-50%); /* Ajusta para centralizar */
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    background-color: #007bff; /* Cor de destaque dos botões */
+    border-radius: 50%; /* Botões arredondados */
+    padding: 10px; /* Espaçamento interno */
+    color: white; /* Cor do texto do ícone */
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    background-color: #0056b3; /* Cor do botão ao passar o mouse */
+}
+
 .carousel-indicators .active {
-    background-color: #fff; 
+    background-color: #fff;
 }
 @media (max-width: 576px) {
     .card-body {

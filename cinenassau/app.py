@@ -1,9 +1,12 @@
 from flask import Flask, request, render_template, jsonify, session, redirect, flash, url_for
 from pymongo import MongoClient
+import bson
 import requests
 import bcrypt 
 from bcrypt import hashpw, gensalt, checkpw
 from bson.objectid import ObjectId
+from bson import ObjectId, errors
+
 
 app = Flask(__name__)
 app.secret_key = '0f5152fe09bcb82401da522de768581521212121212121'
@@ -17,14 +20,57 @@ filmes_collection = db['filmes']
 # Chave da API TMDb
 TMDB_API_KEY = '0f5152fe09bcb82401da522de7685815'
 
-# Rota Dashboard e redirecionar caso não esteja logado
+from flask import jsonify
+
+@app.route('/minhas_avaliacoes_json')
+def minhas_avaliacoes_json():
+    if 'usuario_id' not in session:
+        return jsonify({"error": "Usuário não autenticado"}), 401
+
+    usuario_id = session['usuario_id']
+    usuario = usuarios_collection.find_one({"_id": ObjectId(usuario_id)})
+
+    if usuario is None:
+        return jsonify({"error": "Usuário não encontrado"}), 404
+
+    # Buscar as avaliações do usuário
+    avaliacoes = usuario.get('avaliacoes', [])
+
+    # Retornar as avaliações em formato JSON
+    return jsonify(avaliacoes)
+
+
+
+# Rota Dashboard
 @app.route('/dashboard')
 def dashboard():
     if 'usuario_id' not in session:
         return redirect('/login')  # Redireciona para a página de login se não estiver autenticado
-    usuario_id = session['usuario_id']
-    return render_template('dashboard.html', usuario_id=usuario_id)
 
+    usuario_id = session['usuario_id']
+    usuario = usuarios_collection.find_one({"_id": ObjectId(usuario_id)})
+
+    if usuario is None:
+        return redirect('/login')  # Redireciona se o usuário não for encontrado
+
+    # Buscar as avaliações do usuário
+    avaliacoes = usuario.get('avaliacoes', [])
+    quantidade_filmes_avaliados = len(avaliacoes)
+
+    # Buscar detalhes dos filmes avaliados
+    filmes_avaliados = []
+    for avaliacao in avaliacoes:
+        filme_id = avaliacao['filme_id']
+        try:
+            filme = filmes_collection.find_one({"id": int(filme_id)})
+            if filme:
+                filme['nota'] = avaliacao['nota']  # Adiciona a nota ao filme
+                filmes_avaliados.append(filme)
+        except Exception as e:
+            print(f"Erro ao buscar filme com ID {filme_id}: {e}")
+            continue  # Ignorar erros de busca
+
+    return render_template('dashboard.html', usuario=usuario, quantidade_filmes_avaliados=quantidade_filmes_avaliados, filmes_avaliados=filmes_avaliados)
 
 # Obter Lista de filmes em alta
 def get_popular_movies():
@@ -47,6 +93,7 @@ def index():
     genres = get_genres()  # Obter os gêneros
     error_message = None
     popular_movies = get_popular_movies()  # Buscar os filmes populares
+    usuario = session.get('usuario_id')
 
     if request.method == 'POST':
         movie_name = request.form['movie_name']
@@ -73,7 +120,7 @@ def index():
             error_message = f"Ocorreu um erro ao acessar a API: {str(e)}. Tente novamente mais tarde."
             return render_template('index.html', movie_data=None, genres=genres, error_message=error_message, popular_movies=popular_movies, enumerate=enumerate), 500
 
-    return render_template('index.html', movie_data=movie_data, genres=genres, error_message=error_message, popular_movies=popular_movies, enumerate=enumerate)
+    return render_template('index.html', movie_data=movie_data, usuario=usuario, genres=genres, error_message=error_message, popular_movies=popular_movies, enumerate=enumerate)
 
 # Rota para exibir informacoes do carousel
 @app.route('/filme/<int:filme_id>', methods=['GET'])
@@ -167,11 +214,39 @@ def avaliar_filme(filme_id):
     
     # Salvar a avaliação no banco de dados
     usuarios_collection.update_one(
-        {"_id": usuario_id},
-        {"$push": {"avaliacoes": {"filme_id": filme_id, "nota": nota}}}
+        {"_id": ObjectId(usuario_id)},
+        {"$push": {"avaliacoes": {"filme_id": filme_id, "nota": nota}}}  # Filme ID é uma string, não ObjectId
     )
     
     return redirect(f'/filme/{filme_id}')  # Redireciona de volta para a página de detalhes do filme
+
+#TESTE MOVIESDB /moviesdb para exibir os filmes no BD
+@app.route('/moviesdb')
+def moviesdb():
+    # Buscar todos os filmes do banco de dados
+    filmes = list(filmes_collection.find({}))
+
+    # Converter ObjectId para string para evitar problemas no template
+    for filme in filmes:
+        filme['_id'] = str(filme['_id'])
+
+    return render_template('moviesdb.html', filmes=filmes)
+
+
+#TESTE /filmes para exibir o json
+@app.route('/filmes', methods=['GET'])
+def listar_filmes():
+    # Buscar todos os filmes no banco de dados
+    filmes = filmes_collection.find()  # Isso traz todos os documentos da coleção
+
+    # Converter o cursor em uma lista
+    filmes_lista = []
+    for filme in filmes:
+        # Convertemos o ObjectId para string para que ele seja serializável
+        filme['_id'] = str(filme['_id'])
+        filmes_lista.append(filme)
+
+    return jsonify(filmes_lista)  # Retorna a lista de filmes como JSON
 
 
 if __name__ == '__main__':
