@@ -46,6 +46,11 @@ cinenassau/
 └── README.md               # Documentação do projeto
 ````
 
-## 📊 Cálculo de Similaridade
+## 📊 Equipe
 
-## 🎯 Geração de Recomendações
+- Samara V - 01565630
+- Giovanna Pergentino - 01565341
+- Eduardo Pereira da Silva - 01558226
+- Carlos Augusto Ferreira da Silva - 01564896
+- Matheus Sena Diniz - 01565579
+- Abner do nascimento santos - 01532315
